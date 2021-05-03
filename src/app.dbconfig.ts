@@ -7,6 +7,7 @@ export function createTypeOrmProdConfig(): TypeOrmModuleOptions {
         password : 'nest',
         database : 'nest',
         synchronize : true,
+        dropSchema: true,
         logging: true,
         entities: [join(__dirname, '**', '*.entity.{ts,js}')],
         logger: 'advanced-console'
