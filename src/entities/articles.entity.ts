@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Comment } from "./comments.entity";
 import { User } from "./user.entity";
 
 @Entity('articles')
@@ -17,6 +18,10 @@ export class Article {
 
     @ManyToOne(() => User)
     author: User
+
+    @OneToMany(() => Comment, comment => comment.article, {eager: true})
+    @JoinColumn()
+    comments: Comment[]
 
     @CreateDateColumn({type: "date"})
     createdAt: Date

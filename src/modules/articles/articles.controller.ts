@@ -3,6 +3,7 @@ import { articleData } from './dto/create-article.dto';
 import { Article } from '../../entities/articles.entity';
 import { ArticlesService } from './articles.service';
 import {User} from '../users/users.decorator'
+import { CommentDto } from './dto/create-comment.dto';
 @Controller('articles')
 export class ArticlesController {
 
@@ -28,5 +29,9 @@ export class ArticlesController {
     @Delete(':slug')
     async deleteArticle(@Param('slug') slug: string) {
         return await this.articlesService.deleteArticle(slug);
+    }
+    @Post(':slug/comments')
+    async addComment(@Body() data: CommentDto, @Param('slug') slug: string) {
+        return await this.articlesService.addComment(data, slug);
     }
 }
