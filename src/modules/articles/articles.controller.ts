@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@ne
 import { articleData } from './dto/create-article.dto';
 import { Article } from '../../entities/articles.entity';
 import { ArticlesService } from './articles.service';
-
+import {User} from '../users/users.decorator'
 @Controller('articles')
 export class ArticlesController {
 
@@ -18,8 +18,8 @@ export class ArticlesController {
     }
     @Post()
     @HttpCode(201)
-    async postArticle(@Body() data: articleData): Promise<Article> {
-        return await this.articlesService.postArticle(data)
+    async postArticle(@Body() data: articleData, @User('email') email: string): Promise<Article> {
+        return await this.articlesService.postArticle(data, email)
     }
     @Patch(':slug')
     async patchArticle(@Param('slug') slug: string, @Body() data: articleData): Promise<Article> {

@@ -1,29 +1,35 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { articleData } from './dto/create-article.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, getRepository, Repository } from 'typeorm';
 import { Article } from '../../entities/articles.entity';
 import { slugify } from '../../utils/string-utils';
+import { User } from '../../entities/user.entity';
+import { sanitization } from '../../utils/security.utils';
 
 @Injectable()
 export class ArticlesService {
-    constructor(@InjectRepository(Article) private readonly articleRepo: Repository<Article>){}
+    constructor(@InjectRepository(Article) private readonly articleRepo: Repository<Article>,
+    @InjectRepository(User) private readonly userRepo: Repository<User>){}
 
     async getAllArticles(): Promise<Article[]> {
         return await this.articleRepo.find();
     }
     async getArticleBySlug(slug: string): Promise<Article> {
         return await this.articleRepo.findOne(slug);
-    }
-    async postArticle(data: articleData): Promise<Article> {
+    }   
+    async postArticle(data: articleData, email: string): Promise<Article> {
 
         const {title, description, body} = data;
-
+        const user = await this.userRepo.findOne(email)
+        if(!user) throw new HttpException({message: "No user with this email found"}, HttpStatus.UNPROCESSABLE_ENTITY); 
+        
         let article = new Article();
         article.slug = slugify(title);
         article.title = title;
         article.description = description;
         article.body = body;
+        article.author = sanitization(user)
         const newArticle = await this.articleRepo.save(article);
         return newArticle;
     }
